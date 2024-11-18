@@ -3,10 +3,10 @@ const { ethers } = require("hardhat");
 
 describe("Escrow Contract", function () {
     let Escrow, escrow;
-    let owner, member1, member2, member3, nonMember;
+    let owner, member1, member2, member3, unauthorized;
 
     beforeEach(async function () {
-        [owner, member1, member2, member3, nonMember] = await ethers.getSigners();
+        [owner, member1, member2, member3, unauthorized] = await ethers.getSigners();
 
         // Deploy the contract
         Escrow = await ethers.getContractFactory("Escrow");
@@ -25,7 +25,7 @@ describe("Escrow Contract", function () {
 
     it("Should not allow non-owner to whitelist members", async function () {
         await expect(
-            escrow.connect(nonMember).setWhitelist(member1.address)
+            escrow.connect(unauthorized).setWhitelist(member1.address)
         ).to.be.revertedWith("NOT AUTHORIZED");
     });
 
@@ -70,7 +70,7 @@ describe("Escrow Contract", function () {
 
     it("Should not allow non-whitelisted member to withdraw funds", async function () {
         await expect(
-            escrow.connect(nonMember).withdrawFunds(ethers.parseEther("1"))
+            escrow.connect(unauthorized).withdrawFunds(ethers.parseEther("1"))
         ).to.be.revertedWith("whitelisted");
     });
 
